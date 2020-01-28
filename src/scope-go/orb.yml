@@ -92,7 +92,6 @@ jobs:
             mkdir -p .scope-results/
             go get -v github.com/undefinedlabs/scope-go-agent-installer
             /go/bin/scope-go-agent-installer -folder=.
-            go get
       - run:
           name: Run tests and benchmarks
           command: | 
