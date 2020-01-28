@@ -1,0 +1,112 @@
+version: 2.1
+description: |
+  Scope for Go Orb runs your tests automatically instrumented with the Scope Go agent
+
+examples:
+  default:
+    description: |
+      You can use this orb to run your tests and benchmarks without any additional configuration.
+    usage:
+      version: 2.1
+
+      orbs:
+        scope: undefinedlabs/scope-go@1.0.0
+
+      workflows:
+        scope_test:
+          jobs:
+            - scope/test:
+                dsn: my-dsn
+
+  custom_commands:
+    description: |
+      You could run any custom test and benchmarks command that you wish.
+    usage:
+      version: 2.1
+
+      orbs: 
+        scope: undefinedlabs/scope-go@1.0.0
+      
+      workflows:
+        scope_test:
+          jobs:
+            - scope/test:
+                dsn: my-dsn
+                test-command: go test -v ./...
+                benchmark-command: go test -run Benchmark -bench=.
+
+  custom_executor:
+    description: |
+      If you want to override the executor used by default.
+    usage:
+      version: 2.1
+
+      orbs:
+        scope: undefinedlabs/scope-go@1.0.0
+
+      executors:
+        my-executor:
+          docker:
+            - image: circleci/golang:1.13
+
+      workflows:
+        scope_test:
+          jobs:
+            - scope/test:
+                executor: my-executor
+
+executors:
+  scope: 
+    description: The docker container to use when running the Scope Go agent
+    docker:
+      - image: circleci/golang:1.13
+
+jobs:
+  test:
+    description: |
+      Checkout and run tests and benchmark using the Scope Go agent
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        description: The name of custom executor to use
+        type: executor
+        default: scope
+      test-command:
+        description: The command to execute when running tests
+        type: string
+        default: go test -covermode=count -coverprofile=.scope-results/coverage.out -v ./...
+      benchmark-command:
+        description: The command to execute when running benchmarks
+        type: string
+        default: go test -run Benchmark -bench=.
+      dsn:
+        description: Scope DSN
+        type: string
+    
+    steps:
+      - checkout
+      - run:
+          name: Install Scope agent
+          command: |
+            mkdir -p .scope-results/
+            go get -v github.com/undefinedlabs/scope-go-agent-installer
+            /go/bin/scope-go-agent-installer -folder=.
+      - run:
+          name: Get dependencies
+          command: |
+            go get
+            go get -u go.undefinedlabs.com/scopeagent
+      - run:
+          name: Run tests
+          command: << parameters.test-command >>
+          environment:
+            SCOPE_LOG_ROOT_PATH: .scope-results
+            SCOPE_DSN: << parameters.dsn >>
+      - run:
+          name: Run benchmarks
+          command: << parameters.benchmark-command >>
+          environment:
+            SCOPE_LOG_ROOT_PATH: .scope-results
+            SCOPE_DSN: << parameters.dsn >>
+      - store_artifacts:
+          path: .scope-results
