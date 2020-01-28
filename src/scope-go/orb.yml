@@ -91,22 +91,13 @@ jobs:
             mkdir -p .scope-results/
             go get -v github.com/undefinedlabs/scope-go-agent-installer
             /go/bin/scope-go-agent-installer -folder=.
-      - run:
-          name: Get dependencies
-          command: |
             go get
-            go get -u go.undefinedlabs.com/scopeagent
       - run:
-          name: Run tests
-          command: << parameters.test-command >>
+          name: Run tests and benchmarks
+          command: | 
+            << parameters.test-command >>
+            << parameters.benchmark-command >>
           environment:
             SCOPE_LOG_ROOT_PATH: .scope-results
-            SCOPE_DSN: << parameters.dsn >>
-      - run:
-          name: Run benchmarks
-          command: << parameters.benchmark-command >>
-          environment:
-            SCOPE_LOG_ROOT_PATH: .scope-results
-            SCOPE_DSN: << parameters.dsn >>
       - store_artifacts:
           path: .scope-results
