@@ -10,7 +10,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.0.0
+        scope: undefinedlabs/scope-go@1.1.0
 
       workflows:
         scope_test:
@@ -26,7 +26,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.0.0
+        scope: undefinedlabs/scope-go@1.1.0
 
       workflows:
         scope_test:
@@ -42,7 +42,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.0.0
+        scope: undefinedlabs/scope-go@1.1.0
 
       workflows:
         scope_test:
@@ -58,7 +58,7 @@ examples:
       version: 2.1
 
       orbs: 
-        scope: undefinedlabs/scope-go@1.0.0
+        scope: undefinedlabs/scope-go@1.1.0
       
       workflows:
         scope_test:
@@ -75,7 +75,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.0.0
+        scope: undefinedlabs/scope-go@1.1.0
 
       executors:
         my-executor:
