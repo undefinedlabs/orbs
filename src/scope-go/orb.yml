@@ -18,6 +18,39 @@ examples:
             - scope/test:
                 dsn: my-dsn
 
+  disable_autoinstrumentation:
+    description: |
+      If the source code is manually instrumented you can disable the auto instrumentation process 
+      before running the tests 
+    usage:
+      version: 2.1
+
+      orbs:
+        scope: undefinedlabs/scope-go@1.0.0
+
+      workflows:
+        scope_test:
+          jobs:
+            - scope/test:
+                dsn: my-dsn
+                auto-instrument: false
+
+  disable_benchmarks:
+    description: |
+      You could disable the benchmarks execution
+    usage:
+      version: 2.1
+
+      orbs:
+        scope: undefinedlabs/scope-go@1.0.0
+
+      workflows:
+        scope_test:
+          jobs:
+            - scope/test:
+                dsn: my-dsn
+                enable-benchmarks: false
+
   custom_commands:
     description: |
       You could run any custom test and benchmarks command that you wish.
@@ -82,22 +115,40 @@ jobs:
       dsn:
         description: Scope DSN
         type: string
-    
+      auto-instrument:
+        description: Auto instrument the source code with the scope agent
+        type: boolean
+        default: true
+      enable-benchmarks:
+        description: Disable the benchmarks execution
+        type: boolean
+        default: true
     steps:
       - checkout
+      - when:
+          condition: << parameters.auto-instrument >>
+          steps:
+            - run:
+                name: Install Scope agent
+                command: |
+                  go get -v github.com/undefinedlabs/scope-go-agent-installer
+                  /go/bin/scope-go-agent-installer -folder=.
       - run:
-          name: Install Scope agent
-          command: |
+          name: Run tests
+          command: | 
             echo 'CIRCLE_WORKING_DIRECTORY="${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}"' >> $BASH_ENV
             mkdir -p .scope-results/
-            go get -v github.com/undefinedlabs/scope-go-agent-installer
-            /go/bin/scope-go-agent-installer -folder=.
-      - run:
-          name: Run tests and benchmarks
-          command: | 
             << parameters.test-command >>
-            << parameters.benchmark-command >>
           environment:
             SCOPE_LOG_ROOT_PATH: .scope-results
+      - when:
+          condition:  << parameters.enable-benchmarks >>
+          steps:
+            - run:
+                name: Run benchmarks
+                command: | 
+                  << parameters.benchmark-command >>
+                environment:
+                  SCOPE_LOG_ROOT_PATH: .scope-results
       - store_artifacts:
           path: .scope-results
