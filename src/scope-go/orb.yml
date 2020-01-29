@@ -120,7 +120,7 @@ jobs:
         type: boolean
         default: true
       enable-benchmarks:
-        description: Disable the benchmarks execution
+        description: Enable the benchmarks execution
         type: boolean
         default: true
     steps:
