@@ -10,7 +10,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.1.0
+        scope: undefinedlabs/scope-go@1.1.1
 
       workflows:
         scope_test:
@@ -26,7 +26,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.1.0
+        scope: undefinedlabs/scope-go@1.1.1
 
       workflows:
         scope_test:
@@ -42,7 +42,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.1.0
+        scope: undefinedlabs/scope-go@1.1.1
 
       workflows:
         scope_test:
@@ -58,7 +58,7 @@ examples:
       version: 2.1
 
       orbs: 
-        scope: undefinedlabs/scope-go@1.1.0
+        scope: undefinedlabs/scope-go@1.1.1
       
       workflows:
         scope_test:
@@ -75,7 +75,7 @@ examples:
       version: 2.1
 
       orbs:
-        scope: undefinedlabs/scope-go@1.1.0
+        scope: undefinedlabs/scope-go@1.1.1
 
       executors:
         my-executor:
@@ -125,6 +125,11 @@ jobs:
         default: true
     steps:
       - checkout
+      - run:
+          name: Setting up the working directory
+          command: |
+            echo 'CIRCLE_WORKING_DIRECTORY="${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}"' >> $BASH_ENV
+            mkdir -p .scope-results/
       - when:
           condition: << parameters.auto-instrument >>
           steps:
@@ -136,8 +141,6 @@ jobs:
       - run:
           name: Run tests
           command: | 
-            echo 'CIRCLE_WORKING_DIRECTORY="${CIRCLE_WORKING_DIRECTORY/#\~/$HOME}"' >> $BASH_ENV
-            mkdir -p .scope-results/
             << parameters.test-command >>
           environment:
             SCOPE_LOG_ROOT_PATH: .scope-results
